@@ -120,7 +120,7 @@ namespace Rul.Pages
         {
             orderProducts.Add(LViewProduct.SelectedItem as Product);
 
-            if (orderProducts.Count > 0) 
+            if (orderProducts.Count > 0)
             {
                 btnOrder.Visibility = Visibility.Visible;
             }
@@ -128,8 +128,15 @@ namespace Rul.Pages
 
         private void btnOrder_Click(object sender, RoutedEventArgs e)
         {
-            OrderWindow orderWindow = new OrderWindow(orderProducts, user);
-            orderWindow.Show();
+            if (user != null)
+            {
+                OrderWindow orderWindow = new OrderWindow(orderProducts, user);
+                orderWindow.Show();
+            }
+            else
+            {
+                MessageBox.Show("Зарегистрируйтесь, чтобы заказывать!");
+            }
         }
     }
 }

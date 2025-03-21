@@ -38,5 +38,39 @@ namespace Rul.Entities
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<OrderProduct> OrderProduct { get; set; }
+
+        public string Backgroung
+        {
+            get
+            {
+                if (this.ProductDiscountAmount > 15)
+                {
+                    return "#7fff00";
+                }
+                return "#fff";
+            }
+        }
+
+        public string CostWithDiscount
+        {
+            get
+            {
+                if (this.ProductMaxDiscountAmount > 0)
+                {
+                    var costWithDiscount = Convert.ToDouble(this.ProductCost) - Convert.ToDouble(this.ProductCost) * Convert.ToDouble(this.ProductDiscountAmount / 100.00);
+                    return costWithDiscount.ToString();
+                }
+                return this.ProductCost.ToString();
+            }
+        }
+
+        public string ImgPath
+        {
+            get
+            {
+                var path = $"pack://application:,,,/Resources/{this.ProductPhoto}";
+                return path;
+            }
+        }
     }
 }
