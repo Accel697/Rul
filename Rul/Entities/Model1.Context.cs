@@ -15,6 +15,8 @@ namespace Rul.Entities
     
     public partial class RulEntities2 : DbContext
     {
+        private static RulEntities2 context;
+
         public RulEntities2()
             : base("name=RulEntities2")
         {
@@ -27,7 +29,11 @@ namespace Rul.Entities
 
         public static RulEntities2 GetContext()
         {
-            return new RulEntities2();
+            if (context == null)
+            {
+                context = new RulEntities2();
+            }
+            return context;
         }
     
         public virtual DbSet<Order> Order { get; set; }

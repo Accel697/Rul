@@ -56,7 +56,7 @@ namespace Rul.Pages
 
         private void btnOrderSave_Click(object sender, RoutedEventArgs e)
         {
-            var productArticle = productList.Select(p => p.ProductArticleNumber).ToList();
+            var productArticle = productList.Select(p => p.ProductArticleNumber).ToArray();
             Random random = new Random();
             var date = DateTime.Now;
             if (productList.Any(p => p.ProductQuantityInStock < 3))

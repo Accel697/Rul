@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -52,57 +53,56 @@ namespace Rul.Pages
             string login = txtbLogin.Text.Trim();
             string password = pswbPassword.Password.Trim();
 
-            using (var context = RulEntities2.GetContext())
+            var context = RulEntities2.GetContext();
+
+            var user = context.User.Where(x => x.UserLogin == login && x.UserPassword == password).FirstOrDefault();
+
+            if (click == 1)
             {
-                var user = context.User.Where(x => x.UserLogin == login && x.UserPassword == password).FirstOrDefault();
-
-                if (click == 1)
+                if (user != null)
                 {
-                    if (user != null)
-                    {
-                        txtbLogin.Clear();
-                        pswbPassword.Clear();
-                        LoadPage(user, user.UserRole.ToString());
-                    }
-                    else
-                    {
-                        MessageBox.Show("Вы ввели логин или пароль неверно!");
-                        GenerateCapctcha();
-
-                        pswbPassword.Clear();
-
-                        tblCaptcha.Visibility = Visibility.Visible;
-                        tblCaptcha.Text = CaptchaGenerator.GenerateCaptchaText(6);
-                    }
+                    txtbLogin.Clear();
+                    pswbPassword.Clear();
+                    LoadPage(user, user.UserRole.ToString());
                 }
-                else if (click > 1)
+                else
                 {
-                    if (click == 3)
-                    {
-                        BlockControls();
+                    MessageBox.Show("Вы ввели логин или пароль неверно!");
+                    GenerateCapctcha();
 
-                        remainingTime = 10;
-                        txtbTimer.Visibility = Visibility.Visible;
-                        timer.Start();
-                    }
+                    pswbPassword.Clear();
 
-                    if (user != null && tbCaptcha.Text == tblCaptcha.Text)
-                    {
-                        txtbLogin.Clear();
-                        pswbPassword.Clear();
-                        tblCaptcha.Text = "Text";
-                        tbCaptcha.Text = "";
-                        tbCaptcha.Visibility = Visibility.Hidden;
-                        tblCaptcha.Visibility = Visibility.Hidden;
-                        LoadPage(user, user.UserRole.ToString());
-                    }
-                    else
-                    {
+                    tblCaptcha.Visibility = Visibility.Visible;
+                    tblCaptcha.Text = CaptchaGenerator.GenerateCaptchaText(6);
+                }
+            }
+            else if (click > 1)
+            {
+                if (click == 3)
+                {
+                    BlockControls();
 
-                        tblCaptcha.Text = CaptchaGenerator.GenerateCaptchaText(6);
-                        tbCaptcha.Text = "";
-                        MessageBox.Show("Пройдите капчу заново!");
-                    }
+                    remainingTime = 10;
+                    txtbTimer.Visibility = Visibility.Visible;
+                    timer.Start();
+                }
+
+                if (user != null && tbCaptcha.Text == tblCaptcha.Text)
+                {
+                    txtbLogin.Clear();
+                    pswbPassword.Clear();
+                    tblCaptcha.Text = "Text";
+                    tbCaptcha.Text = "";
+                    tbCaptcha.Visibility = Visibility.Hidden;
+                    tblCaptcha.Visibility = Visibility.Hidden;
+                    LoadPage(user, user.UserRole.ToString());
+                }
+                else
+                {
+
+                    tblCaptcha.Text = CaptchaGenerator.GenerateCaptchaText(6);
+                    tbCaptcha.Text = "";
+                    MessageBox.Show("Пройдите капчу заново!");
                 }
             }
         }
