@@ -55,6 +55,9 @@
                 <TextBlock Text="Стоимость за еденицу:"/>
                 <TextBox Name="txtCost" Text="{Binding ProductCost}"/>
 
+                <TextBlock Text="Производитель:"/>
+                <TextBox Name="txtManufacturer" Text="{Binding ProductManufacturer}"/>
+
                 <StackPanel Orientation="Horizontal">
                     <StackPanel>
                         <Image x:Name="img" Width="100" Height="100" Source="{Binding ImgPath, FallbackValue={StaticResource defaultImage}}"/>

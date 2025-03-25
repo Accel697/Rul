@@ -53,11 +53,12 @@ namespace Rul.Pages
         {
             OpenFileDialog getImageDialog = new OpenFileDialog();
 
-            getImageDialog.Filter = "Файлы изображений: (*.png, *.jpg, *.jpeg)| *.png, *.jpg, *.jpeg";
+            getImageDialog.Filter = "Файды изображений: (*.png, *.jpg, *.jpeg)| *.png; *.jpg; *.jpeg";
             getImageDialog.InitialDirectory = "D:\\programmesmodules\\Rul\\Rul\\Resources";
             if (getImageDialog.ShowDialog() == true)
             {
                 product.ProductPhoto = getImageDialog.SafeFileName;
+                img.Source = new BitmapImage(new Uri(getImageDialog.FileName));
             }
         }
 
@@ -83,6 +84,8 @@ namespace Rul.Pages
         {
             StringBuilder errors = new StringBuilder();
 
+            RulEntities2 db = new RulEntities2();
+
             if (product.ProductCost < 0)
                 errors.AppendLine("Стоимость не может быть отрицательной!");
             if (product.ProductMinCount < 0)
@@ -96,18 +99,39 @@ namespace Rul.Pages
                 return;
             }
 
-            if (product.ProductArticleNumber == null)
-                RulEntities2.GetContext().Product.Add(product);
-
-            try
+            if (!db.Product.Any(x => x.ProductArticleNumber == txtArticle.Text))
             {
-                RulEntities2.GetContext().SaveChanges();
-                MessageBox.Show("Информация сохранена!", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
-                NavigationService.GoBack();
+                try
+                {
+                    db.Product.Add(product);
+                    db.SaveChanges();
+                    MessageBox.Show("Информация сохранена!", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                    NavigationService.GoBack();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message.ToString(), "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show(ex.Message.ToString(), "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                try
+                {
+                    var product = db.Product.FirstOrDefault(x => x.ProductArticleNumber == txtArticle.Text);
+                    product.ProductManufacturer = txtManufacturer.Text;
+                    product.ProductCategory = cmbCategory.Text;
+                    product.ProductQuantityInStock = Convert.ToInt32(txtCountInStock.Text);
+                    product.ProductUnit = txtUnit.Text;
+                    product.ProductDiscountAmount = Convert.ToByte(txtDiscount.Text);
+                    product.ProductSupplier = txtSupplier.Text;
+                    product.ProductMaxDiscountAmount = Convert.ToByte(txtMaxDiscount.Text);
+                    db.SaveChanges();
+                    MessageBox.Show("Информация сохранена!", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message.ToString(), "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
     }

@@ -52,6 +52,8 @@ namespace Rul.Pages
         {
             if (MessageBox.Show("Вы уверены, что хотите удалить этот элемент?", "Предупреждение", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                 productList.Remove(LViewOrder.SelectedItem as Product);
+            LViewOrder.ItemsSource = null;
+            LViewOrder.ItemsSource = productList;
         }
 
         private void btnOrderSave_Click(object sender, RoutedEventArgs e)
@@ -87,13 +89,28 @@ namespace Rul.Pages
                 };
                 RulEntities2.GetContext().Order.Add(newOrder);
 
+                var productCount = new Dictionary<string, int>();
+
                 for (int i = 0; i < productArticle.Count(); i++)
+                {
+                    var articleNumber = productArticle[i];
+                    if (productCount.ContainsKey(articleNumber))
+                    {
+                        productCount[articleNumber]++;
+                    }
+                    else
+                    {
+                        productCount[articleNumber] = 1;
+                    }
+                }
+
+                foreach (var entry in productCount)
                 {
                     OrderProduct newOrderProduct = new OrderProduct()
                     {
                         OrderID = newOrder.OrderID,
-                        ProductArticleNumber = productArticle[i],
-                        Quantity = 1
+                        ProductArticleNumber = entry.Key,
+                        Quantity = entry.Value
                     };
                     RulEntities2.GetContext().OrderProduct.Add(newOrderProduct);
                 }
@@ -105,6 +122,15 @@ namespace Rul.Pages
             catch (Exception ex) 
             {
                 MessageBox.Show(ex.Message.ToString());
+            }
+        }
+
+        private void Page_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (Visibility == Visibility.Visible)
+            {
+                RulEntities2.GetContext().ChangeTracker.Entries().ToList().ForEach(p => p.Reload());
+                LViewOrder.ItemsSource =productList;
             }
         }
     }
